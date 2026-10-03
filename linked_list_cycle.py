@@ -5,18 +5,21 @@ class ListNode:
 
 
 def hasCycle(head: ListNode) -> bool:
+    if head == None:
+        return False
     visitats = set()
     cicle = False
     final = False
     visitats.add(head)
     seguent = head.next
     while cicle == False and final == False:
-        visitats.add(seguent)
-        seguent = seguent.next
         if seguent in visitats:
             cicle = True
         elif seguent == None:
             final = True
+        else:
+            visitats.add(seguent)
+            seguent = seguent.next
     if final == True:
         return False
     else:
