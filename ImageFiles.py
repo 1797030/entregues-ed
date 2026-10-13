@@ -53,13 +53,9 @@ class ImageFiles():
 
 
     def files_added(self) -> List:
-        if len(self._darrers_afegitss) == 0:
-            return "No hi darrers afegits"
         return list(self._darrers_afegits)
 
     def files_removed(self) -> List:
-        if len(self._darrers_eliminats) == 0:
-            return "No hi darrers eliminats"
         return list(self._darrers_eliminats)
 
     def __str__(self):
