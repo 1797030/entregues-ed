@@ -53,7 +53,7 @@ Notes:
     - Els operadors lògics NO modifiquen les llistes originals
     - Aquests mètodes NO retornen objectes Gallery, sinó llistes simples
 """
-
+import cfg
 class SearchMetadata:
     def __init__(self, image_data):
         self.image_data = image_data

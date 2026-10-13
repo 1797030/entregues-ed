@@ -58,7 +58,6 @@ Notes:
     - Tots els camps de metadades es guarden com a strings
 """
 import os
-import cfg
 from cfg import read_png_metadata, get_png_dimensions
 
 class ImageData ():

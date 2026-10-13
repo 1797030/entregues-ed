@@ -50,6 +50,7 @@ Notes:
 """
 
 import json
+import cfg
 
 class Gallery:
     """Representa una galeria d'imatges carregada desde un fitxer JSON"""
