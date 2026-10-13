@@ -58,7 +58,7 @@ Notes:
     - Tots els camps de metadades es guarden com a strings
 """
 import os
-from cfg import read_png_metadata, get_png_dimensions
+from cfg import read_png_metadata
 
 class ImageData ():
 
@@ -104,7 +104,7 @@ class ImageData ():
         camps = ['prompt', 'seed', 'cfg_scale', 'steps', 'sampler', 'model', 'generated', 'created_date']
         entrada['metadata'] = {camp: "None" for camp in camps}
         
-        dimensions = get_png_dimensions(path)
+        dimensions = self.get_dimensions(uuid)
         if dimensions:
             entrada['dimensions'] = dimensions
 
