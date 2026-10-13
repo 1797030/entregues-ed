@@ -117,7 +117,7 @@ class ImageData ():
         return "None"
     
     def get_prompt(self, uuid: str) -> str:
-        return self._get_field(uuid, 'prompt')
+        return str(self._get_field(uuid, 'prompt'))
     
     def get_model(self, uuid: str) -> str:
             return self._get_field(uuid, 'model')
