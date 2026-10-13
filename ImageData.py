@@ -58,10 +58,14 @@ Notes:
     - Tots els camps de metadades es guarden com a strings
 """
 import os
-from cfg import read_png_metadata
 import cfg
+from PIL import Image
 
 class ImageData ():
+
+    CAMPS = ['prompt', 'seed', 'cfg_scale', 'steps',
+             'sampler', 'model', 'generated', 'created_date']
+
 
     def __init__(self):
         self._imatges = {}
@@ -76,16 +80,7 @@ class ImageData ():
         self._imatges[uuid] = {
             "file": file,
             "dimensions": (None, None),
-            "metadata": {
-                'prompt': "None",
-                'model': "None",
-                'seed': "None",
-                'cfg_scale': "None",
-                'steps': "None",
-                'sampler': "None",
-                'generated': "None",
-                'created_date': "None"
-            }
+            "metadata": {camp: "None" for camp in self.CAMPS}
         }
 
     def remove_image(self, uuid: str) -> None:
@@ -98,25 +93,22 @@ class ImageData ():
             return
 
         entrada = self._imatges[uuid]
-        path = os.path.join(cfg.ROOT_DIR, entrada['file']) #uneix el directori amb la ruta alternativa
+        path = os.path.join(cfg.ROOT_DIR, entrada['file'])
 
         # Reiniciem tot abans de llegir
         entrada['dimensions'] = (None, None)
-        camps = ['prompt', 'seed', 'cfg_scale', 'steps', 'sampler', 'model', 'generated', 'created_date']
-        entrada['metadata'] = {camp: "None" for camp in camps}
-        
-        dimensions = self.get_dimensions(uuid)
-        if dimensions:
-            entrada['dimensions'] = dimensions
+        entrada['metadata'] = {camp: "None" for camp in self.CAMPS}
 
-        # Llegir metadades PNG
-        meta_1 = read_png_metadata(path)
-        if not meta_1:
+        try:
+            with Image.open(path) as img:
+                entrada['dimensions'] = (img.width, img.height)
+                text = getattr(img, "text", {})   # text chunks del PNG
+        except Exception as e:
+            print(f"ERROR llegint {path}: {e}")
             return
-    
-        meta = {str(k).lower(): str(v) for k, v in meta_1.items()} # passem tot a minuscules
 
-        for camp in camps:
+        meta = {str(k).lower(): str(v) for k, v in text.items()}
+        for camp in self.CAMPS:
             entrada['metadata'][camp] = meta.get(camp, "None")
 
     def get_filename(self, uuid: str) -> str:
