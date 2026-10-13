@@ -42,8 +42,8 @@ class ImageFiles():
         for carpeta_actual, subcarpetes, arxius in os.walk(path): #os.walr permet la cerca recursiva, però no se si ho he d'implementar jo des de 0
             for arxiu in arxius:
                 if arxiu.lower().endswith(".png"):
-                    path = os.path.join(carpeta_actual, arxiu)
-                    path_relatiu = get_canonical_pathfile(path)
+                    arxiu_path = os.path.join(carpeta_actual, arxiu)
+                    path_relatiu = get_canonical_pathfile(arxiu_path)
                     resultat.add(path_relatiu)
         
         #El fet d'utilitzar sets ens permet fer aquestes operacions
