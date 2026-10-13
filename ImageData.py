@@ -59,6 +59,7 @@ Notes:
 """
 import os
 from cfg import read_png_metadata
+import cfg
 
 class ImageData ():
 
