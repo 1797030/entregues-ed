@@ -102,16 +102,12 @@ class ImageData ():
         try:
             with Image.open(path) as img:
                 entrada['dimensions'] = (img.width, img.height)
+                text = getattr(img, "text", {})   # text chunks del PNG
         except Exception as e:
             print(f"ERROR llegint {path}: {e}")
             return
 
-        meta_1 = cfg.read_png_metadata(path)
-
-        if not meta_1:
-            return
-
-        meta = {str(k).lower(): str(v) for k, v in meta_1.items()}
+        meta = {str(k).lower(): str(v) for k, v in text.items()}
         for camp in self.CAMPS:
             entrada['metadata'][camp] = meta.get(camp, "None")
 
