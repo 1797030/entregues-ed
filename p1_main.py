@@ -14,4 +14,4 @@ Exemples d'ús:
     - Carregar i mostrar galeries
     - Fer cerques i crear galeries a partir dels resultats
 """
-
+import cfg
