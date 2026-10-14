@@ -68,19 +68,28 @@ class Gallery:
         return f"Gallery amb {len(self.images)} imatges vàlides."
 
     def load_file(self, file):
-        """Carrega els UUID registrats que apareixen al fitxer JSON."""
         if self.image_id is None:
             raise ValueError("Cal passar ImageID per carregar una galeria JSON")
 
-        with open(file, 'r', encoding='utf-8') as f:
+        with open(file, "r", encoding="utf-8") as f:
             data = json.load(f)
 
+        root_name = cfg.ROOT_DIR.replace("\\", "/").rstrip("/").split("/")[-1]
         self.images = []
-        for image_path in data['images']:
-            uuid = self.image_id.get_uuid(image_path)
+
+        for image_path in data["images"]:
+            if not isinstance(image_path, str):
+                continue
+
+            path = image_path.replace("\\", "/").lstrip("/")
+            prefix = root_name + "/"
+            if path.startswith(prefix):
+                path = path[len(prefix):]
+
+            uuid = self.image_id.get_uuid(path)
             if uuid is not None:
                 self.images.append(uuid)
-
+                
     def show(self):
         """Visualitza els UUID de la galeria en ordre."""
         if self.image_viewer is None:

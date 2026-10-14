@@ -53,6 +53,7 @@ Notes:
     - Els operadors lògics NO modifiquen les llistes originals
     - Aquests mètodes NO retornen objectes Gallery, sinó llistes simples
 """
+
 import cfg
 class SearchMetadata:
     def __init__(self, image_data):
@@ -153,4 +154,3 @@ class SearchMetadata:
         list1_set = set(list1)
         list2_set = set(list2)
         return list(list1_set | list2_set)
-
