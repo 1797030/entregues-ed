@@ -27,7 +27,6 @@ Notes:
     - Només considereu arxius amb extensió .png (case-insensitive)
     - Heu de recórrer tots els subdirectoris recursivament
 """
-from cfg import get_canonical_pathfile #Retorna el pathname relatiu amb un format universal. Exemple: subdir1/subdir2/image01.png
 from typing import List
 import os
 
