@@ -43,6 +43,7 @@ class MyHashMap:
                 if self._table[j2][2] == ESBORRAT and not index_esborrat:
                     idx = j2
                     index_esborrat = True
+
                 elif self._table[j2][2] == LLIURE:
                     if index_esborrat:
                         self._table[idx] = [key, value, OCUPAT]
@@ -90,6 +91,7 @@ class MyHashMap:
                     final = True
                 elif j == j2:
                     final = True
+                i +=1
 
     def _resize(self, cap):
         antiga = self._table
