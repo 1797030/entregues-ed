@@ -35,11 +35,12 @@ class MyHashMap:
             final = False
 
             while final == False:
-                if self._table[j][0] == key:
-                    self._table[j][1] = value
+                j2 = self._hash_function(j+i)
+                if self._table[j2][2] == OCUPAT and self._table[j2][0] == key:
+                    self._table[j2][1] = value
                     return
-                
-                elif self._table[j2][2] == ESBORRAT and not index_esborrat:
+
+                if self._table[j2][2] == ESBORRAT and not index_esborrat:
                     idx = j2
                     index_esborrat = True
                 elif self._table[j2][2] == LLIURE:
