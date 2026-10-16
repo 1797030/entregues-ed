@@ -22,6 +22,7 @@ class MyHashMap:
         j = self._hash_function(key)
         if self._table[j][0] == key:
             self._table[j][1] = value
+            return
 
         if self._table[j][2] == LLIURE:
             self._table[j] = [key, value, OCUPAT]
