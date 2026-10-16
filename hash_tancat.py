@@ -35,8 +35,11 @@ class MyHashMap:
             final = False
 
             while final == False:
-                j2 = self._hash_function(j+i)
-                if self._table[j2][2] == ESBORRAT and not index_esborrat:
+                if self._table[j][0] == key:
+                    self._table[j][1] = value
+                    return
+                
+                elif self._table[j2][2] == ESBORRAT and not index_esborrat:
                     idx = j2
                     index_esborrat = True
                 elif self._table[j2][2] == LLIURE:
@@ -99,22 +102,3 @@ class MyHashMap:
     def __len__(self):
         return self._n
 
-hm = MyHashMap()
-hm.put(40, 7)
-hm.put(14, 3)        # h(14) = h(40) = 1: va a la posició 2
-hm.put(27, 1)        # h(27) = 1: va a la posició 3
-print(hm._table[1:4])       # → [[40, 7, 'O'], [14, 3, 'O'], [27, 1, 'O']]
-hm.remove(14)
-print(hm._table[2])         # → [None, None, 'B']
-print(hm.get(27))           # → 1   (salta la posició ESBORRAT 2)
-print(hm.get(14))           # → -1
-hm.put(53, 9)        # h(53) = 1: reutilitza la posició ESBORRAT 2
-print(hm._table[2])         # → [53, 9, 'O']
-print(len(hm))              # → 3
-
-
-hm = MyHashMap()
-for k in [23, 45, 16, 26, 40, 14, 5, 12, 9, 25]:
-    hm.put(k, 10 * k)
-print(len(hm._table))       # → 25  (ha redimensionat en inserir la 7a clau)
-print(hm.get(25))           # → 250
