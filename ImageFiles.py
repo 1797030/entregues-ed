@@ -44,7 +44,7 @@ class ImageFiles():
                 if arxiu.lower().endswith(".png"):
                     path_complet = os.path.join(carpeta_actual, arxiu)
 
-                    path_relatiu = os.path.relpath(path_complet, cfg.ROOT_DIR)
+                    path_relatiu = os.path.relpath(path_complet, path)
 
                     
                     path_relatiu = path_relatiu.replace(os.sep, "/")
