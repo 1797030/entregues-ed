@@ -42,7 +42,12 @@ class ImageFiles():
         for carpeta_actual, subcarpetes, arxius in os.walk(path): #os.walr permet la cerca recursiva, però no se si ho he d'implementar jo des de 0
             for arxiu in arxius:
                 if arxiu.lower().endswith(".png"):
-                    path_complet = os.path.join(carpeta_actual, arxiu)
+                    # os.walk() pot rebre path tant absolut com relatiu.
+                    # Convertim sempre el fitxer a absolut abans de
+                    # comparar-lo amb cfg.get_root(), que és absolut.
+                    path_complet = os.path.abspath(
+                        os.path.join(carpeta_actual, arxiu)
+                    )
 
 
                     root = cfg.get_root()
