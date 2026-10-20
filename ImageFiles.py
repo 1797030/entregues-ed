@@ -45,7 +45,10 @@ class ImageFiles():
                     path_complet = os.path.join(carpeta_actual, arxiu)
 
 
-                    path_relatiu = os.path.relpath(path_complet, cfg.ROOT_DIR)
+                    # Les rutes es retornen relatives al directori passat a
+                    # reload_fs(), que és el directori que utilitza el
+                    # caller per tornar-les a resoldre.
+                    path_relatiu = os.path.relpath(path_complet, path)
 
                     
                     path_relatiu = path_relatiu.replace(os.sep, "/")
