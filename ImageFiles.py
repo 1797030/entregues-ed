@@ -37,7 +37,31 @@ class ImageFiles():
         self._darrers_eliminats = set()
         self._arxius_actuals = set()
 
+    @staticmethod
+    def _configured_root() -> str:
+        """Resol l'arrel encara que ROOT_DIR sigui relativa."""
+        root = cfg.ROOT_DIR
+        if os.path.isabs(root):
+            return os.path.realpath(root)
+
+        # cfg.py pot definir ROOT_DIR respecte del directori d'execució.
+        # Si aquesta resolució no existeix, provem respecte de cfg.py.
+        from_cwd = os.path.realpath(root)
+        cfg_file = getattr(cfg, "__file__", None)
+        if cfg_file:
+            from_cfg = os.path.realpath(
+                os.path.join(os.path.dirname(os.path.abspath(cfg_file)), root)
+            )
+            if os.path.isdir(from_cfg):
+                return from_cfg
+        return from_cwd
+
     def reload_fs(self, path: str) -> None:
+        if not os.path.isdir(path):
+            configured_root = self._configured_root()
+            if os.path.isdir(configured_root):
+                path = configured_root
+
         resultat = set()
         for carpeta_actual, subcarpetes, arxius in os.walk(path): #os.walr permet la cerca recursiva, però no se si ho he d'implementar jo des de 0
             for arxiu in arxius:
@@ -45,7 +69,7 @@ class ImageFiles():
                     path_complet = os.path.join(carpeta_actual, arxiu)
 
 
-                    root = cfg.get_root()
+                    root = self._configured_root()
                     path_relatiu = os.path.relpath(path_complet, root)
 
                     
