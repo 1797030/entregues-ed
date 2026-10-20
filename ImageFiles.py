@@ -31,36 +31,43 @@ from typing import List
 import os
 import cfg
 
-class ImageFiles:
-    def __init__(self):
-        self._files = set()
-        self._added = []
-        self._removed = []
+class ImageFiles():
+    def __init__(self) -> None: 
+        self._darrers_afegits = set()
+        self._darrers_eliminats = set()
+        self._arxius_actuals = set()
 
     def reload_fs(self, path: str) -> None:
-        root = os.path.realpath(path or cfg.ROOT_DIR)
-        current = set()
-        if os.path.isdir(root):
-            for directory, _, filenames in os.walk(root):
-                for filename in filenames:
-                    if filename.lower().endswith(".png"):
-                        relative = os.path.relpath(os.path.join(directory, filename), root)
-                        current.add(relative.replace(os.sep, "/"))
-        self._added = sorted(current - self._files)
-        self._removed = sorted(self._files - current)
-        self._files = current
+        resultat = set()
+        for carpeta_actual, subcarpetes, arxius in os.walk(path): #os.walr permet la cerca recursiva, però no se si ho he d'implementar jo des de 0
+            for arxiu in arxius:
+                if arxiu.lower().endswith(".png"):
+                    path_complet = os.path.abspath(
+                        os.path.join(carpeta_actual, arxiu)
+                    )
 
-    def files_added(self) -> list:
-        return list(self._added)
 
-    def files_removed(self) -> list:
-        return list(self._removed)
+                    path_relatiu = os.path.relpath(path_complet, cfg.get_root())
 
-    def files(self) -> list:
-        return sorted(self._files)
+                    
+                    path_relatiu = path_relatiu.replace(os.sep, "/")
 
-    def __len__(self):
-        return len(self._files)
+                    resultat.add(path_relatiu)
+        
+        #El fet d'utilitzar sets ens permet fer aquestes operacions
+        self._darrers_afegits = resultat - self._arxius_actuals
+        self._darrers_eliminats = self._arxius_actuals - resultat
+        self._arxius_actuals = resultat
+
+
+    def files_added(self) -> List:
+        return list(self._darrers_afegits)
+
+    def files_removed(self) -> List:
+        return list(self._darrers_eliminats)
+
+    def __str__(self):
+        return str(self._arxius_actuals)
 
 
                 
