@@ -54,103 +54,108 @@ Notes:
     - Aquests mètodes NO retornen objectes Gallery, sinó llistes simples
 """
 
+
 import cfg
 class SearchMetadata:
     def __init__(self, image_data):
         self.image_data = image_data
 
     def __str__(self):
-        return f"SearchMetadata: {len(self.image_data)} imatges registrades"
+        n = len(self.image_data) if self.image_data is not None else 0
+        return f"SearchMetadata: {n} imatges registrades"
 
-    def prompt(self, sub: str) -> list:
-        # Retorna els UUID de les imatges el prompt de les quals conté la subcadena
+    def _cercar_subcadena(self, getter_func, sub) -> list:
+        # Retorna una llista buida si el valor de cerca és None
+        if sub is None:
+            return []
+        if not isinstance(sub, str):
+            try:
+                sub = str(sub)
+            except Exception:
+                return []
+
+        if not self.image_data or not hasattr(self.image_data, '_imatges'):
+            return []
+
         resultat = []
         for uuid in self.image_data._imatges:
-            valor = self.image_data.get_prompt(uuid)
-            if valor is not None and valor !="None" and valor.find(sub) != -1:
-                resultat.append(uuid)
-        return resultat
-
-    def model(self, sub: str) -> list:
-        # Retorna els UUID de les imatges el model de les quals conté la subcadena
-        resultat = []
-        for uuid in self.image_data._imatges:
-            valor = self.image_data.get_model(uuid)
-            if valor is not None and valor !="None" and valor.find(sub) != -1:
-                resultat.append(uuid)
-        return resultat
-
-    def seed(self, sub: str) -> list:
-        # Retorna els UUID de les imatges el seed de les quals conté la subcadena
-        resultat = []
-        for uuid in self.image_data._imatges:
-            valor = self.image_data.get_seed(uuid)
-            if valor is not None and valor !="None" and valor.find(sub) != -1:
-                resultat.append(uuid)
-        return resultat
-
-    def cfg_scale(self, sub: str) -> list:
-        # Retorna els UUID de les imatges el cfg_scale de les quals conté la subcadena
-        resultat = []
-        for uuid in self.image_data._imatges:
-            valor = self.image_data.get_cfg_scale(uuid)
-            if valor is not None and valor !="None" and valor.find(sub) != -1:
-                resultat.append(uuid)
-        return resultat
-
-    def steps(self, sub: str) -> list:
-        # Retorna els UUID de les imatges el steps de les quals conté la subcadena
-        resultat = []
-        for uuid in self.image_data._imatges:
-            valor = self.image_data.get_steps(uuid)
-            if valor is not None and valor !="None" and valor.find(sub) != -1:
-                resultat.append(uuid)
-        return resultat
-
-    def sampler(self, sub: str) -> list:
-        # Retorna els UUID de les imatges el sampler de les quals conté la subcadena
-        resultat = []
-        for uuid in self.image_data._imatges:
-            valor = self.image_data.get_sampler(uuid)
-            if valor is not None and valor !="None" and valor.find(sub) != -1:
-                resultat.append(uuid)
-        return resultat
-
-    def date(self, sub: str) -> list:
-        # Retorna els UUID de les imatges el created_date de les quals conté la subcadena
-        resultat = []
-        for uuid in self.image_data._imatges:
-            valor = self.image_data.get_created_date(uuid)
-            if valor is not None and valor !="None" and valor.find(sub) != -1:
-                resultat.append(uuid)
-        return resultat
-
-    def generated(self, sub: str) -> list:
-        # Retorna els UUID de les imatges el generated de les quals conté la subcadena
-        resultat = []
-        for uuid in self.image_data._imatges:
-            valor = self.image_data.get_generated(uuid)
-            if valor is not None and valor !="None" and valor.find(sub) != -1:
-                resultat.append(uuid)
-        return resultat
-
-    def dimensions(self, width: int, height: int) -> list:
-        # Retorna els UUID de les imatges amb les dimensions especificades
-        resultat = []
-        for uuid in self.image_data._imatges:
-            valor = self.image_data.get_dimensions(uuid)
-            if valor is not None and valor !="None":
-                if valor == (width, height):
+            valor = getter_func(uuid)
+            if valor is not None and valor != "None":
+                if not isinstance(valor, str):
+                    valor = str(valor)
+                if valor.find(sub) != -1:
                     resultat.append(uuid)
         return resultat
 
+    def prompt(self, sub: str) -> list:
+        # Retorna els UUID de les imatges el prompt de les quals conté la subcadena
+        return self._cercar_subcadena(self.image_data.get_prompt, sub)
+
+    def model(self, sub: str) -> list:
+        # Retorna els UUID de les imatges el model de les quals conté la subcadena
+        return self._cercar_subcadena(self.image_data.get_model, sub)
+
+    def seed(self, sub: str) -> list:
+        # Retorna els UUID de les imatges el seed de les quals conté la subcadena
+        return self._cercar_subcadena(self.image_data.get_seed, sub)
+
+    def cfg_scale(self, sub: str) -> list:
+        # Retorna els UUID de les imatges el cfg_scale de les quals conté la subcadena
+        return self._cercar_subcadena(self.image_data.get_cfg_scale, sub)
+
+    def steps(self, sub: str) -> list:
+        # Retorna els UUID de les imatges el steps de les quals conté la subcadena
+        return self._cercar_subcadena(self.image_data.get_steps, sub)
+
+    def sampler(self, sub: str) -> list:
+        # Retorna els UUID de les imatges el sampler de les quals conté la subcadena
+        return self._cercar_subcadena(self.image_data.get_sampler, sub)
+
+    def date(self, sub: str) -> list:
+        # Retorna els UUID de les imatges el created_date de les quals conté la subcadena
+        return self._cercar_subcadena(self.image_data.get_created_date, sub)
+
+    def generated(self, sub: str) -> list:
+        # Retorna els UUID de les imatges el generated de les quals conté la subcadena
+        return self._cercar_subcadena(self.image_data.get_generated, sub)
+
+    def dimensions(self, width: int, height: int) -> list:
+        # Retorna els UUID de les imatges amb les dimensions especificades
+        if width is None or height is None:
+            return []
+        try:
+            w, h = int(width), int(height)
+            if w <= 0 or h <= 0:
+                return []
+        except (ValueError, TypeError):
+            return []
+
+        if not self.image_data or not hasattr(self.image_data, '_imatges'):
+            return []
+
+        resultat = []
+        for uuid in self.image_data._imatges:
+            valor = self.image_data.get_dimensions(uuid)
+            if valor is not None and valor != "None" and valor == (w, h):
+                resultat.append(uuid)
+        return resultat
+
     def and_operator(self, list1: list, list2: list) -> list:
-        
-        list1_set = set(list1)
-        list2_set = set(list2)
-        return list(list1_set & list2_set)
+        if list1 is None or list2 is None:
+            return []
+        try:
+            list1_set = set(list1)
+            list2_set = set(list2)
+            return list(list1_set & list2_set)
+        except Exception:
+            return []
 
     def or_operator(self, list1: list, list2: list) -> list:
-        list1_set = set(list1)
-        list2_set = set(list2)
-        return list(list1_set | list2_set)
+        l1 = list1 if list1 is not None else []
+        l2 = list2 if list2 is not None else []
+        try:
+            list1_set = set(l1)
+            list2_set = set(l2)
+            return list(list1_set | list2_set)
+        except Exception:
+            return []

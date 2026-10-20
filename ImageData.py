@@ -78,7 +78,7 @@ class ImageData ():
 
     def add_image(self, uuid: str, file: str) -> None:
         self._imatges[uuid] = {
-            "file": file.replace("\\", "/"),
+            "file": file,
             "dimensions": (None, None),
             "metadata": {camp: "None" for camp in self.CAMPS}
         }

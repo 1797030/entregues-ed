@@ -50,6 +50,7 @@ Notes:
 """
 
 import json
+import os
 import cfg
 
 class Gallery:
@@ -68,16 +69,33 @@ class Gallery:
         return f"Gallery amb {len(self.images)} imatges vàlides."
 
     def load_file(self, file):
-        if self.image_id is None:
-            raise ValueError("Cal passar ImageID per carregar una galeria JSON")
-
-        with open(file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        root_name = cfg.ROOT_DIR.replace("\\", "/").rstrip("/").split("/")[-1]
         self.images = []
 
-        for image_path in data["images"]:
+        if not file or not isinstance(file, str):
+            return
+
+        path_fitxer = file
+        if not os.path.isabs(path_fitxer) and not os.path.exists(path_fitxer):
+            candidat = os.path.join(cfg.ROOT_DIR, path_fitxer)
+            if os.path.exists(candidat):
+                path_fitxer = candidat
+
+        if not os.path.exists(path_fitxer):
+            return
+
+        try:
+            with open(path_fitxer, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception:
+            return
+
+        if self.image_id is None:
+            return
+
+        root_name = cfg.ROOT_DIR.replace("\\", "/").rstrip("/").split("/")[-1]
+        imatges = data.get("images", []) if isinstance(data, dict) else []
+
+        for image_path in imatges:
             if not isinstance(image_path, str):
                 continue
 
@@ -87,7 +105,7 @@ class Gallery:
                 path = path[len(prefix):]
 
             uuid = self.image_id.get_uuid(path)
-            if uuid is not None:
+            if uuid is not None and uuid not in self.images:
                 self.images.append(uuid)
                 
     def show(self):
@@ -100,16 +118,19 @@ class Gallery:
 
     def add_image_at_end(self, uuid):
         """Afegeix una imatge al final de la galeria."""
-        self.images.append(uuid)
+        if uuid is not None and uuid not in self.images:
+            self.images.append(uuid)
 
     def remove_first_image(self):
         """Elimina la primera imatge de la galeria."""
         if self.images:
-            self.images.pop(0)
+            return self.images.pop(0)
+        return None
 
     def remove_last_image(self):
         """Elimina l'última imatge de la galeria."""
         if self.images:
-            self.images.pop()
+            return self.images.pop()
+        return None
             
     
