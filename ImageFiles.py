@@ -31,36 +31,36 @@ from typing import List
 import os
 import cfg
 
-class ImageFiles():
-    def __init__(self) -> None: 
-        self._darrers_afegits = set()
-        self._darrers_eliminats = set()
-        self._arxius_actuals = set()
+class ImageFiles:
+    def __init__(self):
+        self._files = set()
+        self._added = []
+        self._removed = []
 
     def reload_fs(self, path: str) -> None:
         root = os.path.realpath(path or cfg.ROOT_DIR)
-        resultat = set()
+        current = set()
         if os.path.isdir(root):
             for directory, _, filenames in os.walk(root):
                 for filename in filenames:
                     if filename.lower().endswith(".png"):
                         relative = os.path.relpath(os.path.join(directory, filename), root)
-                        resultat.add(relative.replace(os.sep, "/"))
-        
-        #El fet d'utilitzar sets ens permet fer aquestes operacions
-        self._darrers_afegits = resultat - self._arxius_actuals
-        self._darrers_eliminats = self._arxius_actuals - resultat
-        self._arxius_actuals = resultat
+                        current.add(relative.replace(os.sep, "/"))
+        self._added = sorted(current - self._files)
+        self._removed = sorted(self._files - current)
+        self._files = current
 
+    def files_added(self) -> list:
+        return list(self._added)
 
-    def files_added(self) -> List:
-        return list(self._darrers_afegits)
+    def files_removed(self) -> list:
+        return list(self._removed)
 
-    def files_removed(self) -> List:
-        return list(self._darrers_eliminats)
+    def files(self) -> list:
+        return sorted(self._files)
 
-    def __str__(self):
-        return str(self._arxius_actuals)
+    def __len__(self):
+        return len(self._files)
 
 
                 
