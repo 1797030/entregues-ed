@@ -38,21 +38,19 @@ class ImageFiles():
         self._arxius_actuals = set()
 
     def reload_fs(self, path: str) -> None:
+        collection_root = os.path.realpath(cfg.get_root())
+        root = os.path.realpath(path) if path else collection_root
         resultat = set()
-        for carpeta_actual, subcarpetes, arxius in os.walk(path): #os.walr permet la cerca recursiva, però no se si ho he d'implementar jo des de 0
-            for arxiu in arxius:
-                if arxiu.lower().endswith(".png"):
-                    path_complet = os.path.abspath(
-                        os.path.join(carpeta_actual, arxiu)
-                    )
-
-
-                    path_relatiu = os.path.relpath(path_complet, cfg.get_root())
-
-                    
-                    path_relatiu = path_relatiu.replace(os.sep, "/")
-
-                    resultat.add(path_relatiu)
+        if os.path.isdir(root):
+            for directory, _, filenames in os.walk(root):
+                for filename in filenames:
+                    if filename.lower().endswith(".png"):
+                        full_path = os.path.join(directory, filename)
+                        try:
+                            relative = os.path.relpath(full_path, collection_root)
+                        except ValueError:
+                            relative = os.path.relpath(full_path, root)
+                        resultat.add(relative.replace(os.sep, "/"))
         
         #El fet d'utilitzar sets ens permet fer aquestes operacions
         self._darrers_afegits = resultat - self._arxius_actuals
