@@ -67,7 +67,7 @@ class ImageFiles():
         return list(self._darrers_eliminats)
 
     def __str__(self):
-        return str(len(self._arxius_actuals))
+        return str(self._arxius_actuals)
 
 
                 
