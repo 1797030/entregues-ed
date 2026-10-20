@@ -50,8 +50,7 @@ class ImageFiles():
                     )
 
 
-                    root = cfg.get_root()
-                    path_relatiu = os.path.relpath(path_complet, root)
+                    path_relatiu = os.path.relpath(path_complet, cfg.get_root())
 
                     
                     path_relatiu = path_relatiu.replace(os.sep, "/")
