@@ -71,11 +71,8 @@ class Gallery:
     def load_file(self, file):
         self.images = []
 
-        if self.image_id is None:
-            raise ValueError("Cal passar ImageID per carregar una galeria JSON")
-
         if not file or not isinstance(file, str):
-            raise FileNotFoundError("Fitxer no especificat")
+            return
 
         path_fitxer = file
         if not os.path.isabs(path_fitxer) and not os.path.exists(path_fitxer):
@@ -83,11 +80,20 @@ class Gallery:
             if os.path.exists(candidat):
                 path_fitxer = candidat
 
-        with open(path_fitxer, "r", encoding="utf-8") as f:
-            data = json.load(f)
+        if not os.path.isfile(path_fitxer):
+            return
+
+        try:
+            with open(path_fitxer, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, ValueError, TypeError):
+            return
 
         root_name = cfg.ROOT_DIR.replace("\\", "/").rstrip("/").split("/")[-1]
         imatges = data.get("images", []) if isinstance(data, dict) else []
+
+        if self.image_id is None:
+            return
 
         for image_path in imatges:
             if not isinstance(image_path, str):
