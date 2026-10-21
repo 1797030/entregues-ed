@@ -71,6 +71,8 @@ class ImageViewer ():
             dims_str = "None"
 
         prompt = self._image_data.get_prompt(uuid)
+        if prompt is None:
+            prompt = "None"
         prompt_definitiu = prompt[:70] + "..." if len(prompt) > 80 else prompt
 
         print(f"UUID:         {uuid}")
@@ -115,7 +117,7 @@ class ImageViewer ():
                 return
 
             file_path = self._image_data.get_filename(uuid)
-            if file_path == "None":
+            if file_path == "None" or file_path is None:
                 print(f"ERROR: No s'ha trobat cap fitxer associat al UUID {uuid}")
                 return
 

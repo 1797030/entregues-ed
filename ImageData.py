@@ -93,18 +93,22 @@ class ImageData ():
             return
 
         entrada = self._imatges[uuid]
-        path = os.path.join(cfg.ROOT_DIR, entrada['file'])
+        path = entrada['file']
+        if not os.path.isabs(path):
+            path = os.path.join(cfg.ROOT_DIR, path)
 
         # Reiniciem tot abans de llegir
         entrada['dimensions'] = (None, None)
         entrada['metadata'] = {camp: "None" for camp in self.CAMPS}
 
+        if not os.path.isfile(path):
+            return
+
         try:
             with Image.open(path) as img:
                 entrada['dimensions'] = (img.width, img.height)
                 text = getattr(img, "text", {})   # text chunks del PNG
-        except Exception as e:
-            print(f"ERROR llegint {path}: {e}")
+        except Exception:
             return
 
         meta = {str(k).lower(): str(v) for k, v in text.items()}
@@ -112,15 +116,15 @@ class ImageData ():
             entrada['metadata'][camp] = meta.get(camp, "None")
 
     def get_filename(self, uuid: str) -> str:
-        if uuid in self._imatges:
-            return self._imatges[uuid]['file']
-        return "None"
+        if uuid not in self._imatges:
+            return None
+        return self._imatges[uuid]['file']
     
     def get_prompt(self, uuid: str) -> str:
         return self._get_field(uuid, 'prompt')
     
     def get_model(self, uuid: str) -> str:
-            return self._get_field(uuid, 'model')
+        return self._get_field(uuid, 'model')
 
     def get_seed(self, uuid: str) -> str:
         return self._get_field(uuid, 'seed')
@@ -142,12 +146,14 @@ class ImageData ():
 
     def get_dimensions(self, uuid: str) -> tuple:
         # Retorna (width, height) amb les dimensions de la imatge.
-        if uuid in self._imatges:
-            return self._imatges[uuid]['dimensions']
-        return (None, None)
+        if uuid not in self._imatges:
+            return None
+        return self._imatges[uuid]['dimensions']
 
     def _get_field(self, uuid: str, field: str) -> str:
-        if uuid in self._imatges and field in self._imatges[uuid]['metadata']:
+        if uuid not in self._imatges:
+            return None
+        if field in self._imatges[uuid]['metadata']:
             val = self._imatges[uuid]['metadata'][field]
             return str(val) if val is not None else "None"
         return "None"

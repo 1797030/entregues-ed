@@ -105,7 +105,7 @@ class Gallery:
                 path = path[len(prefix):]
 
             uuid = self.image_id.get_uuid(path)
-            if uuid is not None and uuid not in self.images:
+            if uuid is not None:
                 self.images.append(uuid)
                 
     def show(self):
@@ -118,7 +118,7 @@ class Gallery:
 
     def add_image_at_end(self, uuid):
         """Afegeix una imatge al final de la galeria."""
-        if uuid is not None and uuid not in self.images:
+        if uuid is not None:
             self.images.append(uuid)
 
     def remove_first_image(self):
