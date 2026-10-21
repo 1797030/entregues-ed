@@ -119,10 +119,6 @@ class ImageData ():
         if not uuid or not file:
             return
 
-        # No afegim imatges falses (arxius inexistents)
-        if self._find_file(file) is None:
-            return
-
         uuid_str = str(uuid)
         self._imatges[uuid_str] = {
             "file": file,
