@@ -135,27 +135,34 @@ class ImageData ():
 
     def load_metadata(self, uuid: str) -> None:
         if uuid is None:
-            return
+            raise FileNotFoundError("UUID o fitxer no especificat")
+
         uuid_str = str(uuid)
         if uuid_str not in self._imatges:
-            return
+            target_uuid = None
+            for u, d in self._imatges.items():
+                if d.get('file') == uuid or d.get('file') == uuid_str:
+                    target_uuid = u
+                    break
+            if target_uuid is None:
+                raise FileNotFoundError(f"Arxiu o UUID inexistent: {uuid}")
+            uuid_str = target_uuid
 
         entrada = self._imatges[uuid_str]
         path = self._find_file(entrada['file'])
 
-        # Reiniciem
         entrada['dimensions'] = (None, None)
         entrada['metadata'] = {camp: "None" for camp in self.CAMPS}
 
         if path is None or not os.path.isfile(path):
-            return
+            raise FileNotFoundError(f"Arxiu no trobat: {entrada['file']}")
 
         try:
             with Image.open(path) as img:
                 entrada['dimensions'] = (img.width, img.height)
                 text = getattr(img, "text", {})   # text chunks del PNG
-        except Exception:
-            return
+        except Exception as e:
+            raise FileNotFoundError(f"Error llegint {path}: {e}")
 
         meta = {str(k).lower(): str(v) for k, v in text.items()}
         entrada['metadata'] = {camp: meta.get(camp, "None") for camp in self.CAMPS}
@@ -214,5 +221,3 @@ class ImageData ():
             return None
         val = self._imatges[uuid_str]['metadata'].get(field, "None")
         return str(val) if val is not None else "None"
-
-    
