@@ -71,8 +71,11 @@ class Gallery:
     def load_file(self, file):
         self.images = []
 
+        if self.image_id is None:
+            raise ValueError("Cal passar ImageID per carregar una galeria JSON")
+
         if not file or not isinstance(file, str):
-            return
+            raise FileNotFoundError("Fitxer no especificat")
 
         path_fitxer = file
         if not os.path.isabs(path_fitxer) and not os.path.exists(path_fitxer):
@@ -80,17 +83,8 @@ class Gallery:
             if os.path.exists(candidat):
                 path_fitxer = candidat
 
-        if not os.path.exists(path_fitxer):
-            return
-
-        try:
-            with open(path_fitxer, "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except Exception:
-            return
-
-        if self.image_id is None:
-            return
+        with open(path_fitxer, "r", encoding="utf-8") as f:
+            data = json.load(f)
 
         root_name = cfg.ROOT_DIR.replace("\\", "/").rstrip("/").split("/")[-1]
         imatges = data.get("images", []) if isinstance(data, dict) else []
@@ -124,13 +118,11 @@ class Gallery:
     def remove_first_image(self):
         """Elimina la primera imatge de la galeria."""
         if self.images:
-            return self.images.pop(0)
-        return None
+            self.images.pop(0)
 
     def remove_last_image(self):
         """Elimina l'última imatge de la galeria."""
         if self.images:
-            return self.images.pop()
-        return None
+            self.images.pop()
             
     

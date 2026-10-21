@@ -79,14 +79,13 @@ class ImageData ():
     def add_image(self, uuid: str, file: str) -> None:
         self._imatges[uuid] = {
             "file": file,
-            "dimensions": (None, None),
-            "metadata": {camp: "None" for camp in self.CAMPS}
+            "dimensions": None,
+            "metadata": None
         }
 
     def remove_image(self, uuid: str) -> None:
-        if uuid not in self._imatges:
-            return
-        del self._imatges[uuid]
+        if uuid in self._imatges:
+            del self._imatges[uuid]
 
     def load_metadata(self, uuid: str) -> None:
         if uuid not in self._imatges:
@@ -94,14 +93,14 @@ class ImageData ():
 
         entrada = self._imatges[uuid]
         path = entrada['file']
-        if not os.path.isabs(path):
-            path = os.path.join(cfg.ROOT_DIR, path)
-
-        # Reiniciem tot abans de llegir
-        entrada['dimensions'] = (None, None)
-        entrada['metadata'] = {camp: "None" for camp in self.CAMPS}
+        if not os.path.isabs(path) and not os.path.exists(path):
+            candidat = os.path.join(cfg.ROOT_DIR, path)
+            if os.path.exists(candidat):
+                path = candidat
 
         if not os.path.isfile(path):
+            entrada['dimensions'] = None
+            entrada['metadata'] = None
             return
 
         try:
@@ -109,15 +108,16 @@ class ImageData ():
                 entrada['dimensions'] = (img.width, img.height)
                 text = getattr(img, "text", {})   # text chunks del PNG
         except Exception:
+            entrada['dimensions'] = None
+            entrada['metadata'] = None
             return
 
         meta = {str(k).lower(): str(v) for k, v in text.items()}
-        for camp in self.CAMPS:
-            entrada['metadata'][camp] = meta.get(camp, "None")
+        entrada['metadata'] = {camp: meta.get(camp, "None") for camp in self.CAMPS}
 
     def get_filename(self, uuid: str) -> str:
         if uuid not in self._imatges:
-            return "None"
+            return None
         return self._imatges[uuid]['file']
     
     def get_prompt(self, uuid: str) -> str:
@@ -146,16 +146,16 @@ class ImageData ():
 
     def get_dimensions(self, uuid: str) -> tuple:
         # Retorna (width, height) amb les dimensions de la imatge.
-        if uuid not in self._imatges:
-            return (None, None)
+        if uuid not in self._imatges or self._imatges[uuid]['dimensions'] is None:
+            return None
         return self._imatges[uuid]['dimensions']
 
     def _get_field(self, uuid: str, field: str) -> str:
         if uuid not in self._imatges:
-            return "None"
-        if field in self._imatges[uuid]['metadata']:
-            val = self._imatges[uuid]['metadata'][field]
-            return str(val) if val is not None else "None"
-        return "None"
+            return None
+        if self._imatges[uuid]['metadata'] is None:
+            return None
+        val = self._imatges[uuid]['metadata'].get(field, "None")
+        return str(val) if val is not None else "None"
 
     
