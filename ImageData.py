@@ -76,31 +76,82 @@ class ImageData ():
     def __str__(self) -> str:
         return f"ImageData: {len(self)} imatges registrades"
 
+    def __iter__(self):
+        return iter(self._imatges)
+
+    def __contains__(self, uuid) -> bool:
+        if uuid is None:
+            return False
+        return str(uuid) in self._imatges
+
+    def __getitem__(self, uuid):
+        if uuid is None:
+            return None
+        return self._imatges.get(str(uuid))
+
+    @staticmethod
+    def _find_file(file: str) -> str:
+        if not file or not isinstance(file, str):
+            return None
+        candidates = [
+            file,
+            os.path.join(cfg.ROOT_DIR, file),
+            os.path.join(cfg.get_root(), file),
+            os.path.join("generated_images", file),
+            os.path.join(os.path.dirname(__file__), "..", "..", "generated_images", file),
+            os.path.join(os.path.dirname(__file__), "..", "generated_images", file),
+        ]
+        norm = file.replace("\\", "/")
+        if "generated_images/" in norm:
+            sub = norm.split("generated_images/")[-1]
+            candidates.extend([
+                sub,
+                os.path.join(cfg.ROOT_DIR, sub),
+                os.path.join(cfg.get_root(), sub),
+                os.path.join("generated_images", sub),
+            ])
+        for c in candidates:
+            if os.path.isfile(c):
+                return c
+        return None
+
     def add_image(self, uuid: str, file: str) -> None:
-        self._imatges[uuid] = {
+        if not uuid or not file:
+            return
+
+        # No afegim imatges falses (arxius inexistents)
+        if self._find_file(file) is None:
+            return
+
+        uuid_str = str(uuid)
+        self._imatges[uuid_str] = {
             "file": file,
             "dimensions": None,
             "metadata": None
         }
 
     def remove_image(self, uuid: str) -> None:
-        if uuid in self._imatges:
-            del self._imatges[uuid]
+        if uuid is None:
+            return
+        uuid_str = str(uuid)
+        if uuid_str in self._imatges:
+            del self._imatges[uuid_str]
 
     def load_metadata(self, uuid: str) -> None:
-        if uuid not in self._imatges:
+        if uuid is None:
+            return
+        uuid_str = str(uuid)
+        if uuid_str not in self._imatges:
             return
 
-        entrada = self._imatges[uuid]
-        path = entrada['file']
-        if not os.path.isabs(path) and not os.path.exists(path):
-            candidat = os.path.join(cfg.ROOT_DIR, path)
-            if os.path.exists(candidat):
-                path = candidat
+        entrada = self._imatges[uuid_str]
+        path = self._find_file(entrada['file'])
 
-        if not os.path.isfile(path):
-            entrada['dimensions'] = None
-            entrada['metadata'] = None
+        # Reiniciem
+        entrada['dimensions'] = (None, None)
+        entrada['metadata'] = {camp: "None" for camp in self.CAMPS}
+
+        if path is None or not os.path.isfile(path):
             return
 
         try:
@@ -108,17 +159,21 @@ class ImageData ():
                 entrada['dimensions'] = (img.width, img.height)
                 text = getattr(img, "text", {})   # text chunks del PNG
         except Exception:
-            entrada['dimensions'] = None
-            entrada['metadata'] = None
             return
 
         meta = {str(k).lower(): str(v) for k, v in text.items()}
         entrada['metadata'] = {camp: meta.get(camp, "None") for camp in self.CAMPS}
 
     def get_filename(self, uuid: str) -> str:
-        if uuid not in self._imatges:
+        if uuid is None:
             return None
-        return self._imatges[uuid]['file']
+        uuid_str = str(uuid)
+        if uuid_str not in self._imatges:
+            return None
+        return self._imatges[uuid_str]['file']
+
+    def get_file(self, uuid: str) -> str:
+        return self.get_filename(uuid)
     
     def get_prompt(self, uuid: str) -> str:
         return self._get_field(uuid, 'prompt')
@@ -146,16 +201,22 @@ class ImageData ():
 
     def get_dimensions(self, uuid: str) -> tuple:
         # Retorna (width, height) amb les dimensions de la imatge.
-        if uuid not in self._imatges or self._imatges[uuid]['dimensions'] is None:
+        if uuid is None:
             return None
-        return self._imatges[uuid]['dimensions']
+        uuid_str = str(uuid)
+        if uuid_str not in self._imatges or self._imatges[uuid_str]['dimensions'] is None:
+            return None
+        return self._imatges[uuid_str]['dimensions']
 
     def _get_field(self, uuid: str, field: str) -> str:
-        if uuid not in self._imatges:
+        if uuid is None:
             return None
-        if self._imatges[uuid]['metadata'] is None:
+        uuid_str = str(uuid)
+        if uuid_str not in self._imatges:
             return None
-        val = self._imatges[uuid]['metadata'].get(field, "None")
+        if self._imatges[uuid_str]['metadata'] is None:
+            return None
+        val = self._imatges[uuid_str]['metadata'].get(field, "None")
         return str(val) if val is not None else "None"
 
     

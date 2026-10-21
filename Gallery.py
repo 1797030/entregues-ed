@@ -68,32 +68,50 @@ class Gallery:
         """Retorna una representació llegible de la galeria."""
         return f"Gallery amb {len(self.images)} imatges vàlides."
 
+    @staticmethod
+    def _find_file(file: str) -> str:
+        if not file or not isinstance(file, str):
+            return None
+        candidates = [
+            file,
+            os.path.join(cfg.ROOT_DIR, file),
+            os.path.join(cfg.get_root(), file),
+            os.path.join("generated_images", file),
+            os.path.join(os.path.dirname(__file__), "..", "..", "generated_images", file),
+            os.path.join(os.path.dirname(__file__), "..", "generated_images", file),
+        ]
+        norm = file.replace("\\", "/")
+        if "generated_images/" in norm:
+            sub = norm.split("generated_images/")[-1]
+            candidates.extend([
+                sub,
+                os.path.join(cfg.ROOT_DIR, sub),
+                os.path.join(cfg.get_root(), sub),
+                os.path.join("generated_images", sub),
+            ])
+        for c in candidates:
+            if os.path.isfile(c):
+                return c
+        return None
+
     def load_file(self, file):
         self.images = []
+
+        if self.image_id is None:
+            raise ValueError("Cal passar ImageID per carregar una galeria JSON")
 
         if not file or not isinstance(file, str):
             return
 
-        path_fitxer = file
-        if not os.path.isabs(path_fitxer) and not os.path.exists(path_fitxer):
-            candidat = os.path.join(cfg.ROOT_DIR, path_fitxer)
-            if os.path.exists(candidat):
-                path_fitxer = candidat
+        path_fitxer = self._find_file(file)
+        if path_fitxer is None:
+            path_fitxer = file
 
-        if not os.path.isfile(path_fitxer):
-            return
-
-        try:
-            with open(path_fitxer, "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except (OSError, ValueError, TypeError):
-            return
+        with open(path_fitxer, "r", encoding="utf-8") as f:
+            data = json.load(f)
 
         root_name = cfg.ROOT_DIR.replace("\\", "/").rstrip("/").split("/")[-1]
         imatges = data.get("images", []) if isinstance(data, dict) else []
-
-        if self.image_id is None:
-            return
 
         for image_path in imatges:
             if not isinstance(image_path, str):
