@@ -116,7 +116,7 @@ class ImageData ():
         return None
 
     def add_image(self, uuid: str, file: str) -> None:
-        if not uuid or not file:
+        if uuid is None or file is None:
             return
 
         uuid_str = str(uuid)
@@ -143,11 +143,9 @@ class ImageData ():
         entrada = self._imatges[uuid_str]
         path = self._find_file(entrada['file'])
 
-        # Reiniciem
-        entrada['dimensions'] = (None, None)
-        entrada['metadata'] = {camp: "None" for camp in self.CAMPS}
-
         if path is None or not os.path.isfile(path):
+            entrada['dimensions'] = None
+            entrada['metadata'] = None
             return
 
         try:
@@ -155,6 +153,8 @@ class ImageData ():
                 entrada['dimensions'] = (img.width, img.height)
                 text = getattr(img, "text", {})   # text chunks del PNG
         except Exception:
+            entrada['dimensions'] = None
+            entrada['metadata'] = None
             return
 
         meta = {str(k).lower(): str(v) for k, v in text.items()}
