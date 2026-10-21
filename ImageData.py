@@ -136,16 +136,24 @@ class ImageData ():
     def load_metadata(self, uuid: str) -> None:
         if uuid is None:
             return
+
         uuid_str = str(uuid)
         if uuid_str not in self._imatges:
-            return
+            target_uuid = None
+            for u, d in self._imatges.items():
+                if d.get('file') == uuid or d.get('file') == uuid_str:
+                    target_uuid = u
+                    break
+            if target_uuid is not None:
+                uuid_str = target_uuid
+            else:
+                return
 
         entrada = self._imatges[uuid_str]
         path = self._find_file(entrada['file'])
 
         if path is None or not os.path.isfile(path):
-            entrada['dimensions'] = None
-            entrada['metadata'] = None
+            self.remove_image(uuid_str)
             return
 
         try:
@@ -153,8 +161,7 @@ class ImageData ():
                 entrada['dimensions'] = (img.width, img.height)
                 text = getattr(img, "text", {})   # text chunks del PNG
         except Exception:
-            entrada['dimensions'] = None
-            entrada['metadata'] = None
+            self.remove_image(uuid_str)
             return
 
         meta = {str(k).lower(): str(v) for k, v in text.items()}
@@ -214,5 +221,3 @@ class ImageData ():
             return None
         val = self._imatges[uuid_str]['metadata'].get(field, "None")
         return str(val) if val is not None else "None"
-
-    
