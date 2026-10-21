@@ -117,7 +117,7 @@ class ImageData ():
 
     def get_filename(self, uuid: str) -> str:
         if uuid not in self._imatges:
-            return None
+            return "None"
         return self._imatges[uuid]['file']
     
     def get_prompt(self, uuid: str) -> str:
@@ -147,12 +147,12 @@ class ImageData ():
     def get_dimensions(self, uuid: str) -> tuple:
         # Retorna (width, height) amb les dimensions de la imatge.
         if uuid not in self._imatges:
-            return None
+            return (None, None)
         return self._imatges[uuid]['dimensions']
 
     def _get_field(self, uuid: str, field: str) -> str:
         if uuid not in self._imatges:
-            return None
+            return "None"
         if field in self._imatges[uuid]['metadata']:
             val = self._imatges[uuid]['metadata'][field]
             return str(val) if val is not None else "None"
