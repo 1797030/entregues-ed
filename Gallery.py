@@ -96,7 +96,7 @@ class Gallery:
         return None
 
     def load_file(self, file):
-        self.images = []
+        self.images.clear()
 
         if self.image_id is None:
             raise ValueError("Cal passar ImageID per carregar una galeria JSON")
