@@ -52,11 +52,12 @@ Notes:
 import json
 import os
 import cfg
+from collections import deque
 
 class Gallery:
     """Representa una galeria d'imatges carregada desde un fitxer JSON"""
     def __init__(self, image_id=None, image_viewer=None):
-        self.images = []
+        self.images = deque([])
         self.image_id = image_id
         self.image_viewer = image_viewer
 
@@ -142,7 +143,7 @@ class Gallery:
     def remove_first_image(self):
         """Elimina la primera imatge de la galeria."""
         if self.images:
-            self.images.pop(0)
+            self.images.popleft()
 
     def remove_last_image(self):
         """Elimina l'última imatge de la galeria."""
