@@ -16,9 +16,7 @@ class GrafHash:
                     self.insert_edge(aresta[0], aresta[1])
 
     def insert_vertex(self, x) -> None:
-        if x in self.hash_graf:
-            return None
-        else:
+        if x not in self.hash_graf:
             self.hash_graf[x] = {}
             self.nombre_nodes +=1
 
@@ -29,10 +27,10 @@ class GrafHash:
             self.nombre_arestes +=1
 
     def remove_edge(self, n1, n2) -> None:
-        if self.hash_graf[n1][n2]:
+        if self.has_edge(n1, n2):
             del self.hash_graf[n1][n2]
             del self.hash_graf[n2][n1]
-        self.nombre_arestes -=1
+            self.nombre_arestes -=1
 
     def remove_vertex(self, x) -> None:
         if x in self.hash_graf:
