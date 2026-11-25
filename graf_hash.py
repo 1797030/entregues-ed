@@ -16,13 +16,17 @@ class GrafHash:
                     self.insert_edge(aresta[0], aresta[1])
 
     def insert_vertex(self, x) -> None:
-        self.hash_graf[x] = {}
-        self.nombre_nodes +=1
+        if x in self.hash_graf:
+            return None
+        else:
+            self.hash_graf[x] = {}
+            self.nombre_nodes +=1
 
     def insert_edge(self, n1, n2, p=1) -> None:
-        self.hash_graf[n1][n2] = p
-        self.hash_graf[n2][n1] = p
-        self.nombre_arestes +=1
+        if not self.has_edge(n1, n2):
+            self.hash_graf[n1][n2] = p
+            self.hash_graf[n2][n1] = p
+            self.nombre_arestes +=1
 
     def remove_edge(self, n1, n2) -> None:
         if self.hash_graf[n1][n2]:
@@ -36,22 +40,16 @@ class GrafHash:
                 del self.hash_graf[aresta][x]
                 self.nombre_arestes -=1
             del self.hash_graf[x]
-        self.nombre_nodes -=1
+            self.nombre_nodes -=1
                 
     def has_edge(self, n1, n2) -> bool:
-        if n1 in self.hash_graf and n2 in self.hash_graf:
-            if self.hash_graf[n1][n2] is not None:
-                return True
-            else:
-                return False
-        else:
-            return False
+        return n1 in self.hash_graf and n2 in self.hash_graf[n1]
 
     def weight(self, n1, n2):
         return self.hash_graf[n1][n2]
 
     def degree(self, x) -> int:
-        return len(self.hash_graf[x].keys())
+        return len(self.hash_graf[x])
 
     def num_vertices(self) -> int:
         return self.nombre_nodes
