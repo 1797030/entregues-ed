@@ -17,12 +17,11 @@ Phases:
 """
 
 import json
-from datetime import datetime
 import math
 import os
-from Submission_1.Gallery import Gallery
+from Gallery import Gallery
 import heapq
-import re
+
 
 
 class RecommenderSystem:
