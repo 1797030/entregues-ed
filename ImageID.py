@@ -35,6 +35,8 @@ from cfg import get_uuid
 class ImageID():
     def __init__(slef)-> None:
         slef._uuid_generats = set() #Un set permet fer totes les operacions de cerca més ràpidament
+        slef._file_to_uuid = {}
+        slef._uuid_to_files = {}
 
     def generate_uuid(self, arxiu: str)-> str:
         uuid = str(get_uuid(arxiu)) #Crea el uuid
@@ -43,6 +45,11 @@ class ImageID():
             return None
         else:
             self._uuid_generats.add(uuid)
+            nom = arxiu.replace("\\", "/").rsplit("/", 1)[-1]
+            claus = {arxiu, nom, uuid + ".png"}
+            for clau in claus:
+                self._file_to_uuid[clau] = uuid
+            self._uuid_to_files[uuid] = claus
             return uuid
     
     def get_uuid(self, arxiu: str)-> str: #Tornem a caclular el uuid, si ja el tenim el retornam, així no cal guardar el uuid i l'arxiu associat.
@@ -55,6 +62,9 @@ class ImageID():
     def remove_uuid(self, uuid: str)-> None:
         try:
             self._uuid_generats.remove(uuid)
+            for clau in self._uuid_to_files.pop(uuid, ()):
+                if self._file_to_uuid.get(clau) == uuid:
+                    del self._file_to_uuid[clau]
         except KeyError: #Si no es troba el uuid
             print("El UUID no existeix")
 
