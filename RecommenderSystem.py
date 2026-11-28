@@ -239,8 +239,7 @@ class RecommenderSystem:
         top = heapq.nlargest(k, similituts, key=lambda imatge: imatge[0])
 
         for similitud, clau in top:
-            uuid = self.uuid_de_clau.get(clau, clau)
-            gallery.images.append(uuid)
+            gallery.images.append(clau)
         return gallery
 
     def find_transition_prompts(self, uuid_1: str, uuid_2: str) -> list:
